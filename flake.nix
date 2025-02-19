@@ -15,7 +15,7 @@
     nixosConfigurations.default = nixpkgs.lib.nixosSystem {
       specialArgs = {inherit inputs;};
       modules = [
-        ../configuration.nix
+        /etc/nixos/configuration.nix
         inputs.home-manager.nixosModules.default
         # stylix.nixosModules.stylix
       ];
