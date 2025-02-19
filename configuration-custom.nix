@@ -264,7 +264,6 @@ in
 
   # == Virtualization ==
   virtualisation = {
-    waydroid.enable = true;
     docker = {
       enable = true;
       # enableNvidia = true;
