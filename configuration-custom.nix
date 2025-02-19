@@ -26,7 +26,6 @@ in
   networking.hostName = "${hostVars.workstationName}";
   # networking.wireless.enable = true;
   networking.networkmanager.enable = true;
-
   services.openssh.enable = true;
   services.xrdp.enable = true;
   networking.firewall = {
@@ -48,49 +47,22 @@ in
     LC_TELEPHONE = "en_US.UTF-8";
     LC_TIME = "en_US.UTF-8";
   };
-
   services.xserver.xkb = {
     layout = "us";
     variant = "";
   };
 
   # == DE ==
-  services.xserver.enable = true;
+  services.xserver = {
+    enable = true;
+    displayManager.autoLogin.enable = false;
+    displayManager.autoLogin.user = "ded";
+    windowManager.bspwm.enable = true;
+  }
   services.displayManager.sddm.enable = true;
   services.desktopManager.plasma6.enable = true;
   services.printing.enable = true;
   services.libinput.enable = true;
-
-  # == Sound ==
-  hardware.pulseaudio.enable = false;
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    alsa.support32Bit = true;
-    pulse.enable = true;
-    jack.enable = true;
-    #media-session.enable = true;
-  };
-
-
-  # == User ==
-  users.users.ded = {
-    isNormalUser = true;
-    description = "ded";
-    extraGroups = [ "networkmanager" "wheel" "docker" ];
-    shell = "${pkgs.fish}/bin/fish";
-    home = "/home/ded";
-  };
-
-  home-manager = {
-    extraSpecialArgs = { inherit inputs; };
-    users = { "ded" = import (config.users.users.ded.home + "/.config/home-manager/home.nix"); };
-  };
-
-  services.xserver.displayManager.autoLogin.enable = false;
-  services.xserver.displayManager.autoLogin.user = "ded";
-  services.xserver.windowManager.bspwm.enable = true;
 
   fonts = {
   enableDefaultPackages = true;
@@ -113,11 +85,37 @@ in
 
   programs.bash = {
     shellAliases = {
-      nt = "sudo nixos-rebuild test --flake /etc/nixos#default";
-      ns = "sudo nixos-rebuild switch --flake /etc/nixos#default";
+      nt = "sudo nixos-rebuild test --flake /etc/nixos/custom#default --impure";
+      ns = "sudo nixos-rebuild switch --flake /etc/nixos/custom#default --impure";
     };
   };
 
+
+  # == Sound ==
+  hardware.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    alsa.support32Bit = true;
+    pulse.enable = true;
+    jack.enable = true;
+    #media-session.enable = true;
+  };
+
+
+  # == User ==
+  users.users.ded = {
+    isNormalUser = true;
+    description = "ded";
+    extraGroups = [ "networkmanager" "wheel" "docker" ];
+    shell = "${pkgs.fish}/bin/fish";
+    home = "/home/ded";
+  };
+  home-manager = {
+    extraSpecialArgs = { inherit inputs; };
+    users = { "ded" = import (config.users.users.ded.home + "/.config/home-manager/home.nix"); };
+  };
   security.sudo = {
     enable = true;
     extraConfig = ''
@@ -232,14 +230,8 @@ in
     swww
   ];
 
-  #fix suid slock
-    security.wrappers.slock = {
-    source = "${pkgs.slock}/bin/slock";
-    owner = "root";
-    group = "root";
-    setuid = true;
-  };
 
+  # == Programs ==
   # Enable Flatpak in the system and add the Flathub repository
   services.flatpak.enable = true;
 
@@ -256,19 +248,26 @@ in
     # if ! $FLATPAK list | grep -q com.brave.Browser; then
     #   $FLATPAK install -y flathub com.brave.Browser
     # fi
-
   '';
 
   programs  = {
 	hyprland.enable = true;
 	fish.enable = true;
   };
+  #fix suid slock
+  security.wrappers.slock = {
+    source = "${pkgs.slock}/bin/slock";
+    owner = "root";
+    group = "root";
+    setuid = true;
+  };
 
+  # == Virtualization ==
   virtualisation = {
     waydroid.enable = true;
     docker = {
       enable = true;
-#      enableNvidia = true;
+      # enableNvidia = true;
     };
   };
 }
