@@ -135,6 +135,7 @@ in
     brave
     brightnessctl
     cava
+    chromium
     cmake
     cpio
     cliphist
